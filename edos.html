@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EDOS Search</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input { padding: 10px; width: 300px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    th { background: #f4f4f4; }
+  </style>
+</head>
+<body>
+
+<h2>EDOS - Test Search</h2>
+
+<input type="text" id="search" placeholder="Search Test Name or Code..." onkeyup="searchTable()">
+
+<table id="table">
+  <thead id="thead"></thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+let data = [];
+
+fetch("edos.csv")
+  .then(res => res.text())
+  .then(text => {
+    const rows = text.split("\n").map(r => r.split(","));
+    data = rows;
+    renderTable(rows);
+  });
+
+function renderTable(rows) {
+  let thead = document.getElementById("thead");
+  let tbody = document.getElementById("tbody");
+
+  thead.innerHTML = "<tr>" + rows[0].map(h => `<th>${h}</th>`).join("") + "</tr>";
+  tbody.innerHTML = rows.slice(1).map(row =>
+    "<tr>" + row.map(c => `<td>${c}</td>`).join("") + "</tr>"
+  ).join("");
+}
+
+function searchTable() {
+  let q = document.getElementById("search").value.toLowerCase();
+
+  let filtered = data.filter((row, i) => {
+    if (i === 0) return true;
+    return row.some(cell => cell.toLowerCase().includes(q));
+  });
+
+  renderTable(filtered);
+}
+</script>
+
+</body>
+</html>
